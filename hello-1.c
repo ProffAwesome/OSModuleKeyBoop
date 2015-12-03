@@ -40,15 +40,15 @@ static const char* keysEncoded[] =
                         "\0", "\0", "\0", "\0", "\0", "_PAUSE_"};
 
 struct tty_struct *tty;
-char *output = "\a";
 bool encode = false;
 
 int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
+  char *output;
   
   int ret = NOTIFY_OK;
-  
-  if (code == KBD_KEYCODE && param.down) {
+
+  if (code == KBD_KEYCODE && param->down == 1) {
     output = keys[(int)(param->value)];
     tty->ops->write(tty, output, sizeof(*output)); 
   }  
