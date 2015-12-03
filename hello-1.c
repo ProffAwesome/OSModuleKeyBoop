@@ -9,7 +9,15 @@
 #include <linux/module.h>
 
 #include <linux/keyboard.h>
-#include <linux/syscalls.h>
+#include <linux/unistd.h>
+#include <linux/fcntl.h>
+
+#include <linux/tty.h>
+#include <linux/tty_driver.h>
+#include <linux/tty_flip.h>
+
+struct tty_struct *tty;
+char *output = "buttstuff";
 
 int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
@@ -18,9 +26,9 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   int ret = NOTIFY_OK;
   
   if (code == KBD_KEYCODE) {
-    sys_write(0, "\a", 2); 
+    tty->ops->write(tty, output, sizeof(output)); 
   }  
-  return 0;
+  return ret;
 }
 
 static struct notifier_block nb = {
@@ -29,6 +37,10 @@ static struct notifier_block nb = {
 
 static int hello_init(void)
 {
+  //Open console for writing a beep
+  tty = get_current_tty();
+  printk(KERN_INFO "Opened tty %s", tty->driver->name);
+  
   register_keyboard_notifier(&nb);
   printk(KERN_INFO "Initialized keyboard trace\n");
  // register_keyboard_notifier(&nb);
