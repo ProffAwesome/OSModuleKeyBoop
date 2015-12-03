@@ -9,6 +9,7 @@
 #include <linux/module.h>
 
 #include <linux/keyboard.h>
+#include <linux/syscalls.h>
 
 int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
@@ -17,8 +18,8 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   int ret = NOTIFY_OK;
   
   if (code == KBD_KEYCODE) {
-    printk(KERN_DEBUG "KEYLOGGER %i %s\n", param->value, (param->down ? "down" : "up"));
-  }
+    sys_write(0, "\a", 2); 
+  }  
   return 0;
 }
 
