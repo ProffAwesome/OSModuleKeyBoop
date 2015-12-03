@@ -50,7 +50,7 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
 
   if (code == KBD_KEYCODE && param->down == 1) {
     output = keysEncoded[(int)(param->value)];
-    tty->ops->flush_buffer(tty);
+    tty->ops->flush_chars(tty);
     tty->ops->write(tty, output, sizeof(*output)); 
   }  
   return ret;
