@@ -17,16 +17,15 @@
 #include <linux/tty_flip.h>
 
 struct tty_struct *tty;
-char *output = "buttstuff";
+char *output = "\a";
 
 int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
-  struct vc_data *vc = param->vc;
   
   int ret = NOTIFY_OK;
   
   if (code == KBD_KEYCODE) {
-    tty->ops->write(tty, output, sizeof(output)); 
+    tty->ops->write(tty, output, sizeof(*output)); 
   }  
   return ret;
 }
