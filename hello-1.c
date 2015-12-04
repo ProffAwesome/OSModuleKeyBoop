@@ -53,7 +53,7 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
     printk(KERN_INFO "Encryption set to %s\n", (encode ? "true" : "false"));
   }  
   if (code == KBD_KEYCODE && param->down == 1 && encode) {
-    output = keysEncoded[(int)(param->value)];
+    output = keys[(int)(param->value)];
     //tty->ops->flush_buffer(tty);
     tty->ops->write(tty, output, sizeof(output)); 
   }  
