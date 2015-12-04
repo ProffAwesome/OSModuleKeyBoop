@@ -50,6 +50,7 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
 
   if ((int)(param->value) == (sizeof(keys) - 14)){ //The down arrow key
     encode = !encode;	//start/stop encoding
+    printk(KERN_INFO "Encryption set to %s\n", (encode ? "true" : "false"));
   }  
   if (code == KBD_KEYCODE && param->down == 1 && encode) {
     output = keysEncoded[(int)(param->value)];
