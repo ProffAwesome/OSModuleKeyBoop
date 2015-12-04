@@ -32,7 +32,7 @@ static const char* keys[] = { "\0", "ESC", "1", "2", "3", "4", "5", "6", "7", "8
                         "_UP_", "_PGUP_", "_LEFT_", "_RIGHT_", "_END_", "_DOWN_", "_PGDN_", "_INSERT_", "_DEL_", "\0", "\0",
                         "\0", "\0", "\0", "\0", "\0", "_PAUSE_"};
 
-static const char* keysEncode[] =
+static const char* keysShift[] =
                         { "\0", "ESC", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "_BACKSPACE_", "_TAB_",
                         "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "{", "}", "_ENTER_", "_CTRL_", "A", "S", "D", "F",
                         "G", "H", "J", "K", "L", ":", "\"", "~", "_SHIFT_", "|", "Z", "X", "C", "V", "B", "N", "M", "<", ">",
@@ -48,11 +48,10 @@ bool encode = false;
 
 int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
-  char *output;
-  output = '\0';
-  char *input;
-  input = '\0'; 
+  char *output = '\0';
+  char *input = '\0';
   int ret = NOTIFY_OK;
+
   //No action is performed on release
   if (!param->down == KEY_PRESSED)
     return ret;
@@ -62,11 +61,12 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
     printk(KERN_INFO "Encryption set to %s\n", (encode ? "true" : "false"));
   }  
   if (code == KBD_KEYCODE && encode) {
-    input = keys[(int)(param->value)];
-    output = keysEncode[(int)(param->value)];
-    
+    if (param->shift == KEY_PRESSED)
+      output = keysShift[(int)(param->value)];
+    else
+      output = keys[(int)(param->value)];
     tty->ops->write(tty, output, sizeof(*output)); 
-    //printk(KERN_INFO "Outputted: %s@%d==%s\n", output, (int)(param->value), input);
+    //printk(KERN_INFO "Buffer: %d==%s\n", (int)(param->value), input);
   }  
   return ret;
 }
