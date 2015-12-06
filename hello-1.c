@@ -46,7 +46,7 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   if (!param->down == KEY_PRESSED)
     return ret;
 
-  if ((int)(param->value) == 107){ //The down arrow key
+  if ((int)(param->value) == 107){ //The end arrow key
     encode = !encode;	//start/stop encoding
     printk(KERN_INFO "Encryption set to %s\n", (encode ? "true" : "false"));
   }  
@@ -71,7 +71,9 @@ static int hello_init(void)
 {
   //Open console for writing a beep
   tty = get_current_tty();
-  printk(KERN_INFO "Opened tty %s", tty->driver->name);
+  printk(KERN_INFO "Opened tty %s\n", tty->driver->name);  
+ 
+  printk(KERN_INFO "Test %d\n", tty_buffer_clear(tty->port));
   
   register_keyboard_notifier(&nb);
   printk(KERN_INFO "Initialized keyboard trace\n");
