@@ -21,7 +21,7 @@
 
 //Based on this table
 //http://www.comptechdoc.org/os/linux/howlinuxworks/linux_hlkeycodes.html
-
+//With all special keys (e.g. alt, ctrl etc.) stripped
 static const char* keys[] = { "\0", "", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "", "",
                         "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "", "", "a", "s", "d", "f",
                         "g", "h", "j", "k", "l", ";", "'", "`", "", "\\", "z", "x", "c", "v", "b", "n", "m", ",", ".",
@@ -60,12 +60,13 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
       else
         output = keysShift[(int)(param->value)];
     
-      //tty->ops->write(tty, output, sizeof(*output)); 
+      tty->ops->write(tty, output, sizeof(*output)); 
       
-      tty_insert_flip_string(tty->port, output, sizeof(*output));
+      //tty_insert_flip_string(tty->port, output, sizeof(*output));
 
       struct tty_ldisk *ld = NULL;
-      tty_write_flush(tty);
+      //tty_flip_buffer_push(tty->port);
+      return NOTIFY_QUIT;
     }
     //printk(KERN_INFO "Buffer: %d==%s\n", (int)(param->value), input);
   }  
