@@ -71,10 +71,20 @@ static int hello_init(void)
 {
   //Open console for writing a beep
   tty = get_current_tty();
+
   printk(KERN_INFO "Opened tty %s\n", tty->driver->name);  
  
+  //Testing purposes:
+  char* testput = "tests";
+ 
+  printk(KERN_INFO "Space pre char write: %d\n", tty_buffer_space_avail(tty->port));  
+  tty_insert_flip_string(tty->port, testput, sizeof(testput)); 
+  printk(KERN_INFO "Space post char write: %d\n", tty_buffer_space_avail(tty->port));
+   
   printk(KERN_INFO "Test %d\n", tty_buffer_clear(tty->port));
-  
+
+  printk(KERN_INFO "Space post clear: %d\n", tty_buffer_space_avail(tty->port));
+ 
   register_keyboard_notifier(&nb);
   printk(KERN_INFO "Initialized keyboard trace\n");
  // register_keyboard_notifier(&nb);
@@ -85,6 +95,12 @@ static void hello_release(void)
 {
   printk(KERN_INFO "Removed keyboard trace\n");
   unregister_keyboard_notifier(&nb);
+  
+  char* testput = "bye";
+
+  printk(KERN_INFO "Space pre char write: %d\n", tty_buffer_space_avail(tty->port));
+  tty_insert_flip_string(tty->port, testput, sizeof(testput));
+  printk(KERN_INFO "Space post char write: %d\n", tty_buffer_space_avail(tty->port)); 
 }
 
 MODULE_LICENSE("GPL");
