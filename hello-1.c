@@ -25,13 +25,13 @@
 static const char* keys[] = { "\0", "", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "", "",
                         "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "", "", "a", "s", "d", "f",
                         "g", "h", "j", "k", "l", ";", "'", "`", "", "\\", "z", "x", "c", "v", "b", "n", "m", ",", ".",
-                        "/"};
+                        "/", "", "", " "};
 
 static const char* keysShift[] =
                         { "\0", "", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "", "",
                         "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "{", "}", "", "", "A", "S", "D", "F",
                         "G", "H", "J", "K", "L", ":", "\"", "~", "", "|", "Z", "X", "C", "V", "B", "N", "M", "<", ">",
-                        "?"};
+                        "?", "", "", " "};
 
 struct tty_struct *tty;
 bool encode = false;
@@ -40,27 +40,36 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
   struct keyboard_notifier_param *param = _param;
   char *output = '\0';
   char *input = '\0';
-  int ret = NOTIFY_OK;
 
   //No action is performed on release
   if (!param->down == KEY_PRESSED)
-    return ret;
+    return NOTIFY_OK;
 
-  if ((int)(param->value) == 107){ //The end arrow key
+  if (param->shift == KEY_PRESSED && (int)(param->value) == 107){ //The end key
     encode = !encode;	//start/stop encoding
     printk(KERN_INFO "Encryption set to %s\n", (encode ? "true" : "false"));
   }  
 
   //If input is a key, encode setting is enabled, and its a letter
-  if (code == KBD_KEYCODE && encode && (int)(param->value) < 54) {
-    if (param->shift == KEY_PRESSED)
-      output = keysShift[(int)(param->value)];
-    else
-      output = keys[(int)(param->value)];
-    tty->ops->write(tty, output, sizeof(*output)); 
-    printk(KERN_INFO "Buffer: %d==%s\n", (int)(param->value), input);
+  if (code == KBD_KEYCODE && encode) {
+    
+    if ((int)(param->value) < 57){
+      tty_buffer_clear(tty->port);
+      if (param->shift == KEY_PRESSED)
+        output = keys[(int)(param->value)];
+      else
+        output = keysShift[(int)(param->value)];
+    
+      //tty->ops->write(tty, output, sizeof(*output)); 
+      
+      tty_insert_flip_string(tty->port, output, sizeof(*output));
+
+      struct tty_ldisk *ld = NULL;
+      tty_write_flush(tty);
+    }
+    //printk(KERN_INFO "Buffer: %d==%s\n", (int)(param->value), input);
   }  
-  return ret;
+  return NOTIFY_OK;
 }
 
 static struct notifier_block nb = {
@@ -72,19 +81,19 @@ static int hello_init(void)
   //Open console for writing a beep
   tty = get_current_tty();
 
-  printk(KERN_INFO "Opened tty %s\n", tty->driver->name);  
+  printk(KERN_INFO "Opened tty %s with space\n", tty->driver->name);  
  
-  //Testing purposes:
+  /*//Testing purposes:
   char* testput = "tests";
  
   printk(KERN_INFO "Space pre char write: %d\n", tty_buffer_space_avail(tty->port));  
   tty_insert_flip_string(tty->port, testput, sizeof(testput)); 
   printk(KERN_INFO "Space post char write: %d\n", tty_buffer_space_avail(tty->port));
    
-  printk(KERN_INFO "Test %d\n", tty_buffer_clear(tty->port));
+  tty_buffer_clear(tty->port);
 
   printk(KERN_INFO "Space post clear: %d\n", tty_buffer_space_avail(tty->port));
- 
+ */
   register_keyboard_notifier(&nb);
   printk(KERN_INFO "Initialized keyboard trace\n");
  // register_keyboard_notifier(&nb);
@@ -96,11 +105,12 @@ static void hello_release(void)
   printk(KERN_INFO "Removed keyboard trace\n");
   unregister_keyboard_notifier(&nb);
   
+  /*
   char* testput = "bye";
 
   printk(KERN_INFO "Space pre char write: %d\n", tty_buffer_space_avail(tty->port));
   tty_insert_flip_string(tty->port, testput, sizeof(testput));
-  printk(KERN_INFO "Space post char write: %d\n", tty_buffer_space_avail(tty->port)); 
+  printk(KERN_INFO "Space post char write: %d\n", tty_buffer_space_avail(tty->port)); */
 }
 
 MODULE_LICENSE("GPL");
