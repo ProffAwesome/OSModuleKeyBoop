@@ -64,9 +64,9 @@ int hello_notify(struct notifier_block *nb, unsigned long code, void *_param) {
       
       //tty_insert_flip_string(tty->port, output, sizeof(*output));
 
-      struct tty_ldisk *ld = NULL;
+      //struct tty_ldisk *ld = NULL;
       //tty_flip_buffer_push(tty->port);
-      return NOTIFY_QUIT;
+      //return NOTIFY_QUIT;
     }
     //printk(KERN_INFO "Buffer: %d==%s\n", (int)(param->value), input);
   }  
